@@ -68,9 +68,13 @@ bool AVIWriter::InternalInit()
 
   // create compressed stream
   unsigned long codec = d->codec;
-  if(!codec)
+  if(!codec
+#ifdef _WIN64
+      || true // force on win64
+#endif
+      )
     codec = mmioFOURCC('D','I','B',' '); // uncompressed frames
-
+  
   ZeroMemory(&aco,sizeof(aco));
   aco.fccType = streamtypeVIDEO;
   aco.fccHandler = codec;
@@ -88,6 +92,7 @@ bool AVIWriter::InternalInit()
     }
     else
       goto cleanup;
+#endif
   }
 
   if(AVIMakeCompressedStream(&d->vidC,d->vid,&aco,0) != AVIERR_OK)
